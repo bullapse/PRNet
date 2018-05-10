@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python demo.py --isShow True --is3d False #--isKpt True --isPose True --isFront True --isDepth True --isTexture True --isMask True

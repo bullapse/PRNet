@@ -47,7 +47,7 @@ for i, image_path in enumerate(image_path_list):
     colors = prn.get_colors(image, vertices)
 
     # -- save
-    name = image_path.strip().split('/')[-1][:-4]
+    name = image_path.strip().split('\\')[-1][:-4]
     np.savetxt(os.path.join(save_folder, name + '.txt'), kpt) 
     write_obj(os.path.join(save_folder, name + '.obj'), vertices, colors, prn.triangles) #save 3d face(can open with meshlab)
 

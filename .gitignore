@@ -1,0 +1,5 @@
+Data/net-data
+__pycache__
+TestImages/results
+TestImages/spencer_results
+env
