@@ -1,0 +1,8 @@
+tensorflow-gpu==1.7.0
+scikit-image
+cython
+scipy
+numpy
+matplotlib
+opencv-python
+dlib==19.9

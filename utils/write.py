@@ -28,7 +28,7 @@ def write_obj(obj_name, vertices, colors, triangles):
         obj_name = obj_name + '.obj'
         
     # write obj
-    with open(obj_name, 'wb') as f:
+    with open(obj_name, 'wt') as f:
         
         # write vertices & colors
         for i in range(vertices.shape[0]):

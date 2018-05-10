@@ -12,7 +12,6 @@ from utils.write import write_obj
 os.environ['CUDA_VISIBLE_DEVICES'] = '0' # GPU number, -1 for CPU
 prn = PRN(is_dlib = False) 
 
-
 # ------------- load data
 image_folder = 'TestImages/AFLW2000/'
 save_folder = 'TestImages/AFLW2000_results'
@@ -27,6 +26,7 @@ total_num = len(image_path_list)
 
 for i, image_path in enumerate(image_path_list):
     # read image
+    print("Reading Image")
     image = imread(image_path)
 
     # the core: regress position map    
@@ -47,7 +47,7 @@ for i, image_path in enumerate(image_path_list):
     colors = prn.get_colors(image, vertices)
 
     # -- save
-    name = image_path.strip().split('/')[-1][:-4]
+    name = image_path.strip().split('\\')[-1][:-4]
     np.savetxt(os.path.join(save_folder, name + '.txt'), kpt) 
     write_obj(os.path.join(save_folder, name + '.obj'), vertices, colors, prn.triangles) #save 3d face(can open with meshlab)
 
