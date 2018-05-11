@@ -3,6 +3,7 @@ import os
 from skimage.io import imread, imsave
 from skimage.transform import estimate_transform, warp
 from time import time
+import cv2
 
 from predictor import PosPrediction
 
@@ -20,11 +21,12 @@ class PRN:
 
         #---- load detectors
         if is_dlib:
-            import dlib
-            detector_path = os.path.join(prefix, 'Data/net-data/mmod_human_face_detector.dat')
-            self.face_detector = dlib.cnn_face_detection_model_v1(
-                    detector_path)
-
+            #import dlib
+            #detector_path = os.path.join(prefix, 'Data/net-data/mmod_human_face_detector.dat')
+            #self.face_detector = dlib.cnn_face_detection_model_v1(
+            #       detector_path)
+            face_cascade = cv2.CascadeClassifier('Data/net-data/haarcascade_frontalface_default.xml')
+            self.face_detector = face_cascade
         #---- load PRN 
         self.pos_predictor = PosPrediction(self.resolution_inp, self.resolution_op)
         prn_path = os.path.join(prefix, 'Data/net-data/256_256_resfcn256_weight')
@@ -37,7 +39,7 @@ class PRN:
         self.uv_kpt_ind = np.loadtxt(prefix + '/Data/uv-data/uv_kpt_ind.txt').astype(np.int32) # 2 x 68 get kpt
         self.face_ind = np.loadtxt(prefix + '/Data/uv-data/face_ind.txt').astype(np.int32) # get valid vertices in the pos map
         self.triangles = np.loadtxt(prefix + '/Data/uv-data/triangles.txt').astype(np.int32) # ntri x 3
-        
+        self.faces = []        
         self.uv_coords = self.generate_uv_coords()        
 
     def generate_uv_coords(self):
@@ -96,13 +98,24 @@ class PRN:
             center = np.array([right - (right - left) / 2.0, bottom - (bottom - top) / 2.0])
             size = int(old_size*1.6)
         else:
-            detected_faces = self.dlib_detect(image)
+            st_face = time()
+            #detected_faces = self.dlib_detect(image)
+            detected_faces = self.face_detector.detectMultiScale(image)
+            print("face time: %s" % (time() - st_face))
+            
+            
             if len(detected_faces) == 0:
                 print('warning: no detected face')
                 return None
+            (x,y,w,h) = detected_faces[0]
+            #Test Draw face square for sizing
+            cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
+            cv2.imshow('faces', image)
+            cv2.waitKey(1)
 
-            d = detected_faces[0].rect ## only use the first detected face (assume that each input image only contains one face)
-            left = d.left(); right = d.right(); top = d.top(); bottom = d.bottom()
+            left = x-(w); right = x; top = y+h; bottom = y
+            #d = detected_faces[0].rect ## only use the first detected face (assume that each input image only contains one face)
+            #left = d.left(); right = d.right(); top = d.top(); bottom = d.bottom()
             old_size = (right - left + bottom - top)/2
             center = np.array([right - (right - left) / 2.0, bottom - (bottom - top) / 2.0 + old_size*0.14])
             size = int(old_size*1.58)
@@ -116,9 +129,9 @@ class PRN:
         cropped_image = warp(image, tform.inverse, output_shape=(self.resolution_inp, self.resolution_inp))
 
         # run our net
-        #st = time()
+        st = time()
         cropped_pos = self.net_forward(cropped_image)
-        #print 'net time:', time() - st
+        print('net time: %s' % (time() - st))
 
         # restore 
         cropped_vertices = np.reshape(cropped_pos, [-1, 3]).T

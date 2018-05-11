@@ -85,8 +85,8 @@ def main(args):
         if args.isDepth:
             depth_image = get_depth_image(vertices, prn.triangles, h, w, True)
             depth = get_depth_image(vertices, prn.triangles, h, w)
-            imsave(os.path.join(save_folder, name + '_depth.jpg'), depth_image)
-            sio.savemat(os.path.join(save_folder, name + '_depth.mat'), {'depth':depth})
+            #imsave(os.path.join(save_folder, name + '_depth.jpg'), depth_image)
+            #sio.savemat(os.path.join(save_folder, name + '_depth.mat'), {'depth':depth})
 
         if args.isMat:
             sio.savemat(os.path.join(save_folder, name + '_mesh.mat'), {'vertices': vertices, 'colors': colors, 'triangles': prn.triangles})
@@ -110,7 +110,7 @@ def main(args):
             cv2.imshow('sparse alignment', plot_kpt(image, kpt))
             cv2.imshow('dense alignment', plot_vertices(image, vertices))
             cv2.imshow('pose', plot_pose_box(image, camera_matrix, kpt))
-            cv2.waitKey(0)
+            cv2.waitKey(1)
 
 
 if __name__ == '__main__':

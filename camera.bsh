@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python demo-camera.py --gpu 0 --isDlib True --is3d False --isShow True
